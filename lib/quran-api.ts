@@ -111,8 +111,8 @@ export async function getSurahWithTranslation(
 
   // Zip the two ayah arrays by index (same surah → same length)
   const ayahs: AyahWithTranslation[] = arabicEdition.ayahs.map((arabicAyah, i) => ({
-    number: arabicAyah.number,
-    numberInQuran: arabicAyah.numberInQuran,
+    number: arabicAyah.numberInSurah,
+    numberInQuran: arabicAyah.number,
     arabic: arabicAyah.text,
     translation: indonesianEdition.ayahs[i]?.text ?? "",
     sajda: arabicAyah.sajda,

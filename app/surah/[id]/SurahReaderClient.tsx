@@ -181,8 +181,8 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* ── Sticky Top Bar ───────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
+      {/* ── Top Bar ───────────────────────────────────────────── */}
+      <header className="bg-background border-b border-border">
         <div className="flex items-center px-2 h-14 max-w-lg mx-auto gap-2">
           {/* Back button */}
           <Link
@@ -271,9 +271,6 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
             lang="ar"
           >
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-          </p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Dengan nama Allah Yang Maha Pengasih, Maha Penyayang
           </p>
         </div>
       )}

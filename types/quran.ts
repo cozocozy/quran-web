@@ -29,9 +29,9 @@ export interface Surah {
 
 // ─── A single Ayah within a surah response ────────────────────────────────
 export interface Ayah {
-  number: number;          // Ayah number within the surah
+  number: number;          // Global sequential number (1–6236)
   text: string;            // The ayah text in the edition's language
-  numberInQuran: number;   // Global sequential number (1–6236)
+  numberInSurah: number;   // Ayah number within the surah
   juz: number;
   manzil: number;
   page: number;
