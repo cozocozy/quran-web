@@ -11,15 +11,14 @@
  *
  * Other responsibilities:
  *  - Track last-read position via IntersectionObserver → saveLastRead
- *  - Show/hide scroll-to-top FAB after 300px scroll
  *  - Manage per-surah bookmark state (useBookmarks hook)
  *  - Apply font size from persistent settings
  * ─────────────────────────────────────────────────────────────────────
  */
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, type ComponentType } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronUp, AlignJustify, Globe, BookOpen } from "lucide-react";
+import { ArrowLeft, AlignJustify, Globe, BookOpen } from "lucide-react";
 import { cn, toArabicNumerals } from "@/lib/utils";
 import AyahCard from "@/components/AyahCard";
 import { useBookmarks } from "@/lib/use-bookmarks";
@@ -53,7 +52,7 @@ const NO_BISMILLAH_SURAHS = new Set([1, 9]);
  */
 const READING_MODES: {
   value: ReadingMode;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   label: string;
   ariaLabel: string;
 }[] = [
@@ -92,28 +91,18 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
   const [readingMode, setReadingMode] = useState<ReadingMode>(
     settings.readingMode ?? "default"
   );
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
   const listRef = useRef<HTMLDivElement>(null);
+
+  // ── Scroll to top on mount ─────────────────────────────────────────
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
 
   // ── Sync initial mode from settings after hydration ────────────────
   useEffect(() => {
     setReadingMode(settings.readingMode ?? "default");
   }, [settings.readingMode]);
 
-  // ── Scroll-to-top FAB ──────────────────────────────────────────────
-
-  useEffect(() => {
-    function handleScroll() {
-      setShowScrollTop(window.scrollY > 300);
-    }
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = useCallback(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
 
   // ── Last-read tracking via IntersectionObserver ────────────────────
 
@@ -335,23 +324,6 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
         )}
       </div>
 
-      {/* ── Scroll-to-top FAB ────────────────────────────────────────── */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          aria-label="Kembali ke atas"
-          className={cn(
-            "fixed bottom-24 right-4 z-40",
-            "w-12 h-12 rounded-full shadow-lg",
-            "flex items-center justify-center",
-            "bg-[oklch(0.6_0.14_196)] text-white",
-            "hover:bg-[oklch(0.55_0.16_196)] active:scale-95",
-            "transition-all duration-200 touch-no-highlight"
-          )}
-        >
-          <ChevronUp className="w-5 h-5" aria-hidden="true" />
-        </button>
-      )}
     </div>
   );
 }
