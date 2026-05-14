@@ -54,19 +54,14 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ── Top Bar ──────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="px-4 py-3 max-w-lg mx-auto">
-          <h1 className="text-lg font-bold text-foreground mb-3">Pencarian</h1>
-
-          {/* Search bar — auto-focused on mount */}
-          <SearchBar
-            onSearch={handleSearch}
-            placeholder="Cari surah... (contoh: Al-Baqarah, 2, الب)"
-            autoFocus
-          />
-        </div>
-      </header>
+      {/* ── Search Input ──────────────────────────────────────────────── */}
+      <div className="px-4 py-4 max-w-lg mx-auto">
+        <SearchBar
+          onSearch={handleSearch}
+          placeholder="Cari surah... (contoh: Al-Baqarah, 2, الب)"
+          autoFocus
+        />
+      </div>
 
       {/* ── Results Area ─────────────────────────────────────────────── */}
       <section aria-live="polite" aria-label="Hasil pencarian">

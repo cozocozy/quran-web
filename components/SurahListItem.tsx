@@ -54,15 +54,12 @@ export default function SurahListItem({ surah, searchQuery }: SurahListItemProps
       {/* ── Center: Latin name + translation + stats ──────────────────── */}
       <div className="flex-1 min-w-0 py-2">
         {/* Surah Latin name — highlight matched query */}
-        <p className="text-sm font-semibold text-foreground leading-tight truncate">
+        <p className="text-base font-bold text-foreground leading-tight truncate">
           {searchQuery
             ? highlightMatch(surah.englishName, searchQuery)
             : surah.englishName}
         </p>
-        {/* Indonesian translation of surah name */}
-        <p className="text-xs text-muted-foreground mt-0.5 truncate">
-          {surah.englishNameTranslation}
-        </p>
+        {/* Removed translation as requested */}
         {/* Meta: revelation type + ayah count */}
         <div className="flex items-center gap-2 mt-1">
           <span className="text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide">
@@ -78,7 +75,7 @@ export default function SurahListItem({ surah, searchQuery }: SurahListItemProps
       {/* ── Right: Arabic name + chevron ──────────────────────────────── */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <p
-          className="arabic-text text-base text-foreground"
+          className="arabic-title text-xl text-foreground"
           dir="rtl"
           lang="ar"
         >

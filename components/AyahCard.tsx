@@ -15,7 +15,7 @@
 
 import { memo, useCallback } from "react";
 import { Bookmark, BookmarkCheck, Share2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, toArabicNumerals } from "@/lib/utils";
 import AudioPlayer from "@/components/AudioPlayer";
 import type { AyahWithTranslation, FontSize, ReadingMode } from "@/types/quran";
 
@@ -111,12 +111,16 @@ const AyahCard = memo(function AyahCard({
       <div className="flex items-start justify-between mb-4">
         <div
           className={cn(
-            "flex items-center justify-center w-9 h-9 rounded-full border border-border",
-            "text-xs font-semibold text-muted-foreground bg-muted/50"
+            "flex items-center justify-center w-8 h-8 rounded-full shadow-sm",
+            "bg-[#DFF5EC] text-[#1F7A5A]",
+            "dark:bg-[#1E3A34] dark:text-[#7BE0B8]",
+            readingMode === "translation" 
+              ? "text-[10px] font-bold" 
+              : "text-base font-bold arabic-text leading-none pt-0.5"
           )}
           aria-label={`Ayat ${surahNumber}:${ayah.number}`}
         >
-          {ayah.number}
+          {readingMode === "translation" ? ayah.number : toArabicNumerals(ayah.number)}
         </div>
 
         {/* Juz / page info — hidden in full-translation mode to reduce clutter */}
@@ -131,7 +135,7 @@ const AyahCard = memo(function AyahCard({
       {showArabic && (
         <p
           className={cn(
-            "arabic-text text-foreground mb-4",
+            "arabic-text text-foreground mb-4 text-justify",
             ARABIC_SIZE[fontSize][readingMode],
             // In arabic-only mode add extra bottom margin for visual breathing
             readingMode === "arabic" && "mb-8"
@@ -147,7 +151,7 @@ const AyahCard = memo(function AyahCard({
       {showTranslation && (
         <p
           className={cn(
-            "leading-relaxed text-muted-foreground mb-4",
+            "leading-relaxed text-muted-foreground mb-4 text-justify",
             // Larger text in translation-only mode for easier reading
             readingMode === "translation" ? "text-base" : "text-sm",
             // Border accent only in default mode (would look odd in translation-only)

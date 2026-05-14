@@ -14,7 +14,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Settings, Search } from "lucide-react";
+// import { Settings, Search } from "lucide-react";
 import { getSurahList } from "@/lib/quran-api";
 import SurahListItem from "@/components/SurahListItem";
 import LastReadCard from "@/components/LastReadCard";
@@ -39,38 +39,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ── Sticky Top Bar ──────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
-          {/* App logo / brand */}
-          <div className="flex items-center gap-2">
-            <span className="text-xl" role="img" aria-label="Quran">
-              ☪️
-            </span>
-            <h1 className="text-lg font-bold text-foreground tracking-tight">
-              Al-Quran
-            </h1>
-          </div>
-
-          {/* Action icons — min 44px touch targets */}
-          <div className="flex items-center gap-1">
-            <Link
-              href="/search"
-              aria-label="Cari surah atau ayat"
-              className="flex items-center justify-center w-11 h-11 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors touch-no-highlight"
-            >
-              <Search className="w-5 h-5" aria-hidden="true" />
-            </Link>
-            <Link
-              href="/settings"
-              aria-label="Pengaturan"
-              className="flex items-center justify-center w-11 h-11 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors touch-no-highlight"
-            >
-              <Settings className="w-5 h-5" aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Removed Top Bar as requested to focus on bottom navigation */}
 
       {/* ── Last Read / Welcome Card ─────────────────────────────────── */}
       {/*

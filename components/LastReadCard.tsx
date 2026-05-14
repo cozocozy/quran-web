@@ -77,14 +77,14 @@ export default function LastReadCard() {
         <div>
           {/* Arabic name */}
           <p
-            className="arabic-text text-xl text-white mb-1"
+            className="arabic-title text-2xl text-white mb-1"
             dir="rtl"
             lang="ar"
           >
             {lastRead.surahName}
           </p>
           {/* Latin + ayah number */}
-          <p className="text-sm font-semibold text-white/90">
+          <p className="text-base font-bold text-white/90">
             {lastRead.surahEnglishName}
           </p>
           <p className="text-xs text-white/60 mt-0.5">

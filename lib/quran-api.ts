@@ -19,6 +19,8 @@ import type {
   SurahEdition,
 } from "@/types/quran";
 
+import { INDONESIAN_SURAH_NAMES } from "./surah-names";
+
 /** Base URL for Al-Quran Cloud API v1 */
 const BASE_URL = "https://api.alquran.cloud/v1";
 
@@ -78,7 +80,8 @@ export async function getSurahList(): Promise<SurahListItem[]> {
   return data.map((s) => ({
     number: s.number,
     name: s.name,
-    englishName: s.englishName,
+    // Replace default englishName with standard Indonesian transliteration
+    englishName: INDONESIAN_SURAH_NAMES[s.number] || s.englishName,
     englishNameTranslation: s.englishNameTranslation,
     numberOfAyahs: s.numberOfAyahs,
     revelationType: s.revelationType,
@@ -105,25 +108,43 @@ export async function getSurahWithTranslation(
     `/surah/${surahNumber}/editions/${editions}`
   );
 
-  // data[0] = Arabic (quran-uthmani), data[1] = Indonesian translation
-  const arabicEdition = data[0];
-  const indonesianEdition = data[1];
+  // Ensure we get the correct edition regardless of array order
+  const arabicEdition = data.find((e) => e.edition.identifier === EDITIONS.arabic) || data[0];
+  const indonesianEdition = data.find((e) => e.edition.identifier === EDITIONS.indonesian) || data[1];
+
+  // The exact Bismillah prefix used by Al-Quran Cloud (quran-uthmani edition)
+  const BISMILLAH_PREFIX = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ";
 
   // Zip the two ayah arrays by index (same surah → same length)
-  const ayahs: AyahWithTranslation[] = arabicEdition.ayahs.map((arabicAyah, i) => ({
-    number: arabicAyah.numberInSurah,
-    numberInQuran: arabicAyah.number,
-    arabic: arabicAyah.text,
-    translation: indonesianEdition.ayahs[i]?.text ?? "",
-    sajda: arabicAyah.sajda,
-    page: arabicAyah.page,
-    juz: arabicAyah.juz,
-  }));
+  const ayahs: AyahWithTranslation[] = arabicEdition.ayahs.map((arabicAyah, i) => {
+    let arabicText = arabicAyah.text;
+
+    // The API prepends Bismillah to the first ayah of every surah (except 1 and 9).
+    // We already show Bismillah as a separate header, so we strip it here to avoid duplication.
+    if (arabicEdition.number !== 1 && arabicEdition.number !== 9 && arabicAyah.numberInSurah === 1) {
+      if (arabicText.startsWith(BISMILLAH_PREFIX)) {
+        arabicText = arabicText.substring(BISMILLAH_PREFIX.length);
+      } else if (arabicText.startsWith("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ")) {
+        arabicText = arabicText.substring("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ".length);
+      }
+    }
+
+    return {
+      number: arabicAyah.numberInSurah,
+      numberInQuran: arabicAyah.number,
+      arabic: arabicText,
+      translation: indonesianEdition.ayahs[i]?.text ?? "",
+      sajda: arabicAyah.sajda,
+      page: arabicAyah.page,
+      juz: arabicAyah.juz,
+    };
+  });
 
   return {
     number: arabicEdition.number,
     name: arabicEdition.name,
-    englishName: arabicEdition.englishName,
+    // Replace default englishName with standard Indonesian transliteration
+    englishName: INDONESIAN_SURAH_NAMES[arabicEdition.number] || arabicEdition.englishName,
     englishNameTranslation: arabicEdition.englishNameTranslation,
     revelationType: arabicEdition.revelationType,
     numberOfAyahs: arabicEdition.numberOfAyahs,

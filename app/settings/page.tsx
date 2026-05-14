@@ -50,12 +50,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ── Top Bar ──────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="px-4 h-14 flex items-center max-w-lg mx-auto">
-          <h1 className="text-lg font-bold text-foreground">Pengaturan</h1>
-        </div>
-      </header>
+      {/* Removed Top Bar to focus on bottom navigation */}
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
 
@@ -116,27 +111,6 @@ export default function SettingsPage() {
 
         <Separator />
 
-        {/* ── Translation Toggle ───────────────────────────────────────── */}
-        <section>
-          <div className="flex items-center justify-between gap-4 min-h-[52px]">
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                Tampilkan Terjemahan
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Terjemahan Bahasa Indonesia di bawah setiap ayat
-              </p>
-            </div>
-            <Switch
-              id="translation-toggle"
-              checked={settings.showTranslation}
-              onCheckedChange={setShowTranslation}
-              aria-label="Tampilkan terjemahan Bahasa Indonesia"
-            />
-          </div>
-        </section>
-
-        <Separator />
 
         {/* ── Theme ────────────────────────────────────────────────────── */}
         <section aria-labelledby="theme-heading">

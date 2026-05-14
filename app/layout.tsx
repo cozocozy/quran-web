@@ -16,6 +16,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
+import ThemeProvider from "@/components/ThemeProvider";
 
 // ─── Fonts ────────────────────────────────────────────────────────────
 
@@ -77,6 +78,7 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         {/*
           Scheherazade New — highly legible traditional Naskh typeface.
           Sangat cocok dan nyaman dibaca untuk orang tua.
@@ -84,7 +86,7 @@ export default function RootLayout({
           non-Latin subsets and to allow font-display: swap control.
         */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Scheherazade+New:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
@@ -92,17 +94,13 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        {/*
-          Main content area:
-          - pb-[calc(64px+env(safe-area-inset-bottom))] ensures content
-            isn't hidden behind the fixed bottom nav on iOS
-        */}
-        <main className="min-h-screen pb-[80px]">
-          {children}
-        </main>
-
         {/* Fixed bottom navigation — rendered on all pages */}
-        <BottomNav />
+        <ThemeProvider>
+          <main className="min-h-screen pb-[80px]">
+            {children}
+          </main>
+          <BottomNav />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -21,7 +21,7 @@ const STORAGE_KEY = "quran_app_settings";
 const DEFAULT_SETTINGS: UserSettings = {
   fontSize: "md",
   showTranslation: true,
-  theme: "system",
+  theme: "light",
   readingMode: "default",
 };
 

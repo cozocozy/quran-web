@@ -2,6 +2,14 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@font-face {
+  font-family: "KFGQPC Uthman Taha Naskh";
+  src: url("https://cdn.jsdelivr.net/gh/Ghalwash/KFGQPC-Uthman-Taha-Naskh@master/KFGQPC%20Uthman%20Taha%20Naskh.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -128,8 +136,6 @@
   }
   html {
     @apply font-sans;
-    /* Smooth scrolling for scroll-to-top FAB */
-    scroll-behavior: smooth;
   }
 }
 
@@ -142,8 +148,9 @@
     --quran-accent-foreground: oklch(1 0 0);
     --quran-accent-light: oklch(0.95 0.03 196);
 
-    /* Arabic font — injected by layout.tsx via next/font/google */
-    --font-arabic: "Scheherazade New", "Amiri Quran", serif;
+    /* Arabic font — KFGQPC for high quality Quranic text */
+    --font-arabic: "KFGQPC Uthman Taha Naskh", "Scheherazade New", serif;
+    --font-arabic-title: "KFGQPC Uthman Taha Naskh", "Aref Ruqaa", serif;
 
     /* Safe area for bottom nav (iOS notch) */
     --bottom-nav-height: 64px;
@@ -163,11 +170,19 @@
 .arabic-text {
   font-family: var(--font-arabic);
   direction: rtl;
-  text-align: right;
+  text-align: justify;
   /* Enable Quranic ligatures and contextual alternates */
   font-feature-settings: "rlig" 1, "calt" 1, "liga" 1;
   line-height: 2;             /* Extra line-height for diacritics */
   word-spacing: 0.1em;
+}
+
+.arabic-title {
+  font-family: var(--font-arabic-title);
+  direction: rtl;
+  font-feature-settings: "rlig" 1, "calt" 1, "liga" 1;
+  /* Aref Ruqaa usually doesn't need as much line-height */
+  line-height: 1.5;
 }
 
 /* Font size variants controlled by settings hook */

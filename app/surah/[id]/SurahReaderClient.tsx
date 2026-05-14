@@ -20,7 +20,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronUp, AlignJustify, Globe, BookOpen } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, toArabicNumerals } from "@/lib/utils";
 import AyahCard from "@/components/AyahCard";
 import { useBookmarks } from "@/lib/use-bookmarks";
 import { useLastRead } from "@/lib/use-last-read";
@@ -196,13 +196,13 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
           {/* Surah name (center) */}
           <div className="flex-1 text-center min-w-0">
             <p
-              className="arabic-text text-lg text-foreground leading-tight"
+              className="arabic-title text-2xl text-foreground leading-tight"
               dir="rtl"
               lang="ar"
             >
               {surah.name}
             </p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-xs font-bold text-foreground">
               {surah.englishName} · {surah.numberOfAyahs} Ayat
             </p>
           </div>
@@ -250,13 +250,11 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
 
       {/* ── Surah info banner ────────────────────────────────────────── */}
       <div className="bg-[oklch(0.95_0.03_196)] dark:bg-[oklch(0.2_0.04_196)] py-3 px-4 text-center">
-        <p className="text-xs text-[oklch(0.5_0.14_196)] dark:text-[oklch(0.7_0.1_196)]">
+        <p className="text-xs font-bold text-[oklch(0.5_0.14_196)] dark:text-[oklch(0.7_0.1_196)]">
           {surah.revelationType === "Meccan" ? "Makkiyah" : "Madaniyah"} ·{" "}
           Surah ke-{surah.number}
         </p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {surah.englishNameTranslation}
-        </p>
+        {/* Removed translation as requested */}
       </div>
 
       {/* ── Bismillah header (skip for surah 1 & 9) ─────────────────── */}
@@ -264,7 +262,7 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
         <div className="py-6 px-4 text-center border-b border-border bg-background">
           <p
             className={cn(
-              "arabic-text text-foreground",
+              "arabic-text text-foreground !text-center",
               readingMode === "arabic" ? "arabic-text-lg" : "arabic-text-md"
             )}
             dir="rtl"
@@ -295,8 +293,8 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
                   className="inline"
                 >
                   {ayah.arabic}{" "}
-                  <span className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-border text-sm font-medium text-muted-foreground mx-1.5 align-middle bg-muted/30">
-                    {ayah.number}
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full text-base font-bold mx-1.5 align-middle shadow-sm bg-[#DFF5EC] text-[#1F7A5A] dark:bg-[#1E3A34] dark:text-[#7BE0B8] arabic-text leading-none pt-0.5">
+                    {toArabicNumerals(ayah.number)}
                   </span>{" "}
                 </span>
               ))}
@@ -312,7 +310,7 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
                   data-ayah={ayah.number}
                   className="inline"
                 >
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full border border-border text-[11px] font-semibold text-muted-foreground mr-1.5 align-middle bg-muted/30">
+                  <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[9px] font-bold mr-1.5 align-middle shadow-sm bg-[#DFF5EC] text-[#1F7A5A] dark:bg-[#1E3A34] dark:text-[#7BE0B8]">
                     {ayah.number}
                   </span>
                   <span dangerouslySetInnerHTML={{ __html: ayah.translation }} />{" "}

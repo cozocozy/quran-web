@@ -21,17 +21,7 @@ export default function BookmarkPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ── Top Bar ──────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
-          <h1 className="text-lg font-bold text-foreground">Bookmark</h1>
-          {bookmarks.length > 0 && (
-            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-              {bookmarks.length} ayat
-            </span>
-          )}
-        </div>
-      </header>
+      {/* Removed Top Bar to focus on bottom navigation */}
 
       {/* ── Content ──────────────────────────────────────────────────── */}
       {bookmarks.length === 0 ? (
