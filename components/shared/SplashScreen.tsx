@@ -13,12 +13,24 @@ import { cn } from "@/lib/utils";
  * ─────────────────────────────────────────────────────────────────────
  */
 
+const MOTIVATIONAL_QUOTES = [
+  "Sebaik-baik kalian adalah yang belajar Al-Quran dan mengajarkannya.",
+  "Satu huruf dari Al-Quran adalah sepuluh kebaikan.",
+  "Jadikan Al-Quran sebagai teman sejatinya hatimu.",
+  "Al-Quran adalah cahaya yang menerangi jalan hidupmu.",
+  "Bacalah Al-Quran, karena ia akan datang memberi syafaat."
+];
+
 export default function SplashScreen() {
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+  const [quote, setQuote] = useState("");
 
   useEffect(() => {
+    // Pilih kutipan acak saat komponen dimuat
+    setQuote(MOTIVATIONAL_QUOTES[Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)]);
+
     // Check if we've already shown the splash in this session
     const hasShown = sessionStorage.getItem("quran-splash-shown");
     
@@ -78,9 +90,9 @@ export default function SplashScreen() {
         </div>
 
         {/* Brand Header */}
-        <div className="text-center mb-10">
-          <h1 className="arabic-title text-4xl text-white mb-2" dir="rtl" lang="ar">
-            القرآن الكريم
+        <div className="text-center mb-10 px-2">
+          <h1 className="text-base md:text-lg font-bold text-white mb-3 leading-snug italic">
+            "{quote}"
           </h1>
           <p className="text-[10px] font-bold text-white/50 tracking-[0.3em] uppercase">
             Digital Al-Quran App
