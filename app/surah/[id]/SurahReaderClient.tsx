@@ -334,7 +334,7 @@ export default function SurahReaderClient({ initialSurah, surahNumber }: SurahRe
           <div className="px-4 py-8 bg-background leading-loose">
             <p
               className={cn(
-                "arabic-text text-foreground leading-[2.5] text-justify",
+                "arabic-text text-foreground leading-[2.5] text-right",
                 settings.fontSize === "sm" ? "arabic-text-md" : "arabic-text-lg"
               )}
               dir="rtl"
@@ -358,7 +358,7 @@ export default function SurahReaderClient({ initialSurah, surahNumber }: SurahRe
         ) : readingMode === "translation" ? (
           /* Novel-style continuous reading (Translation) */
           <div className="px-5 py-8 bg-background">
-            <p className="text-foreground leading-loose text-justify text-[15px]">
+            <p className="text-foreground leading-loose text-[15px]">
               {surah.ayahs.map((ayah) => (
                 <span
                   key={ayah.number}
