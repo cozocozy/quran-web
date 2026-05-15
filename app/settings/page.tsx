@@ -216,6 +216,9 @@ export default function SettingsPage() {
                     aria-valuemax={100}
                   />
                 </div>
+                <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+                  ⏱️ Download dilambatkan agar tidak terkena limit API. Proses ~3–5 menit. Jangan tutup halaman ini.
+                </p>
               </div>
             )}
 

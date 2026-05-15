@@ -4,11 +4,12 @@
  * ─────────────────────────────────────────────────────────────────────
  * Hook untuk mengelola download manual data Quran ke IndexedDB.
  *
- * Features:
- *  - Download semua 114 surah satu per satu dengan progress tracking
- *  - Bisa cancel download
- *  - Status: idle | downloading | done | error
- *  - Hitung ukuran cache (jumlah surah tersimpan)
+ * Strategi anti-rate-limit:
+ *  - Download dikelompokkan per batch (BATCH_SIZE surah)
+ *  - Delay antar request: REQUEST_DELAY ms
+ *  - Delay antar batch: BATCH_DELAY ms
+ *  - Jika gagal (termasuk 429), retry dengan exponential backoff
+ *  - Surah yang sudah di-cache di-skip otomatis (resume-friendly)
  * ─────────────────────────────────────────────────────────────────────
  */
 
@@ -16,9 +17,21 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import {
   saveSurah,
   getCachedSurahCount,
+  getCachedSurahNumbers,
   clearOfflineData,
 } from "./offline-storage";
 import { getSurahWithTranslation } from "./quran-api";
+
+// ─── Config ──────────────────────────────────────────────────────────
+
+/** Jumlah surah per batch sebelum jeda panjang */
+const BATCH_SIZE = 5;
+/** Delay antar setiap request (ms) — cukup untuk hindari rate limit */
+const REQUEST_DELAY = 600;
+/** Jeda antar batch (ms) — beri napas server */
+const BATCH_DELAY = 2000;
+/** Maksimum retry per surah sebelum di-skip */
+const MAX_RETRIES = 3;
 
 // ─── Types ────────────────────────────────────────────────────────────
 
@@ -72,38 +85,67 @@ export function useOfflineDownload(): UseOfflineDownload {
 
     cancelledRef.current = false;
     setStatus("downloading");
-    setDownloaded(0);
     setErrorMessage(null);
 
-    let successCount = 0;
-
     try {
+      // Ambil surah yang sudah di-cache agar bisa di-skip (resume)
+      const alreadyCached = new Set(await getCachedSurahNumbers());
+      let sessionCount = alreadyCached.size;
+      setDownloaded(sessionCount);
+
       for (let surahNum = 1; surahNum <= TOTAL_SURAHS; surahNum++) {
-        // Cek cancel
         if (cancelledRef.current) {
           setStatus("idle");
           setCachedCount(await getCachedSurahCount());
           return;
         }
 
-        try {
-          const surah = await getSurahWithTranslation(surahNum);
-          await saveSurah(surah);
-          successCount++;
-          setDownloaded(successCount);
-        } catch {
-          // Jika satu surah gagal, skip dan lanjutkan
-          // (tidak batalkan seluruh proses)
-          console.warn(`[Offline] Gagal download surah ${surahNum}, skip.`);
+        // Skip surah yang sudah ada di IndexedDB
+        if (alreadyCached.has(surahNum)) continue;
+
+        // Download dengan retry + exponential backoff
+        let success = false;
+        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+          if (cancelledRef.current) break;
+          try {
+            const surah = await getSurahWithTranslation(surahNum);
+            await saveSurah(surah);
+            sessionCount++;
+            setDownloaded(sessionCount);
+            success = true;
+            break;
+          } catch (err) {
+            const backoff = REQUEST_DELAY * 2 ** attempt; // 600, 1200, 2400ms
+            console.warn(
+              `[Offline] Surah ${surahNum} gagal (attempt ${attempt + 1}/${MAX_RETRIES}), retry dalam ${backoff}ms…`,
+              err
+            );
+            await sleep(backoff);
+          }
         }
 
-        // Throttle kecil agar tidak spam API
-        await sleep(80);
+        if (!success) {
+          console.warn(`[Offline] Surah ${surahNum} di-skip setelah ${MAX_RETRIES}x retry.`);
+        }
+
+        // Jeda antar request
+        await sleep(REQUEST_DELAY);
+
+        // Jeda lebih panjang setelah setiap batch
+        const positionInBatch = surahNum % BATCH_SIZE;
+        if (positionInBatch === 0 && surahNum < TOTAL_SURAHS) {
+          await sleep(BATCH_DELAY);
+        }
       }
 
       const finalCount = await getCachedSurahCount();
       setCachedCount(finalCount);
-      setStatus("done");
+      setStatus(finalCount >= TOTAL_SURAHS ? "done" : "error");
+      if (finalCount < TOTAL_SURAHS) {
+        setErrorMessage(
+          `${TOTAL_SURAHS - finalCount} surah gagal diunduh. Tekan "Lanjutkan" untuk retry.`
+        );
+      }
     } catch (err) {
       setErrorMessage(
         err instanceof Error ? err.message : "Download gagal, coba lagi."
