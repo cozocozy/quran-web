@@ -67,13 +67,13 @@ export default function SplashScreen() {
       <div className="flex flex-col items-center w-full max-w-[280px] animate-in fade-in zoom-in duration-700">
         
         {/* Modern Quran Icon */}
-        <div className="relative w-32 h-32 mb-8 animate-bounce-slow">
+        <div className="relative w-32 h-32 mb-8 animate-bounce-slow rounded-3xl overflow-hidden shadow-2xl shadow-black/20 bg-white">
           <Image
             src="/quran-icon.png"
             alt="Al-Quran"
             fill
             priority
-            className="object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)]"
+            className="object-contain"
           />
         </div>
 

@@ -229,13 +229,13 @@ export default function SettingsPage() {
             {/* Done message */}
             {state.status === "done" && (
               <div className="flex flex-col items-center justify-center py-5 px-4 bg-gradient-to-b from-green-50/50 to-transparent dark:from-green-950/20 dark:to-transparent rounded-xl border border-green-100 dark:border-green-900/30">
-                <div className="relative w-24 h-24 mb-4">
+                <div className="relative w-20 h-20 mb-4 rounded-2xl overflow-hidden shadow-lg bg-white">
                   <Image
                     src="/quran-icon.png"
                     alt="Al-Quran Offline"
                     fill
-                    className="object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
-                    sizes="(max-width: 96px) 100vw, 96px"
+                    className="object-contain hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 80px) 100vw, 80px"
                   />
                 </div>
                 <p className="text-sm font-semibold text-green-700 dark:text-green-400 text-center">
