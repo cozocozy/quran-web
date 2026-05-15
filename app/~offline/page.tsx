@@ -15,8 +15,39 @@
 
 import Link from "next/link";
 import { WifiOff, BookOpen } from "lucide-react";
+import { useEffect, useState } from "react";
+import SurahReaderClient from "@/app/surah/[id]/SurahReaderClient";
 
 export default function OfflineFallbackPage() {
+  const [surahNumber, setSurahNumber] = useState<number | null>(null);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    // Periksa apakah user membuka halaman surah tertentu saat offline
+    // Meskipun SW melayani halaman /~offline, URL di browser tetap sesuai request asli.
+    const path = window.location.pathname;
+    const match = path.match(/^\/surah\/(\d+)/);
+    
+    if (match) {
+      setSurahNumber(Number(match[1]));
+    }
+    setIsChecking(false);
+  }, []);
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground animate-pulse text-sm">Memeriksa ketersediaan data offline...</p>
+      </div>
+    );
+  }
+
+  // Jika user mencoba mengakses /surah/X, serahkan pada SurahReaderClient 
+  // untuk meload data surah tersebut dari IndexedDB lokal.
+  if (surahNumber) {
+    return <SurahReaderClient initialSurah={null} surahNumber={surahNumber} />;
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
       {/* Icon */}
