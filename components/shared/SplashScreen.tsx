@@ -60,7 +60,7 @@ export default function SplashScreen() {
     <div
       className={cn(
         "fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-all duration-700 ease-in-out",
-        "bg-[#0d9488]", // Matching the Teal-600 color
+        "bg-gradient-to-br from-[oklch(0.6_0.14_196)] to-[oklch(0.5_0.18_220)]",
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       )}
     >
