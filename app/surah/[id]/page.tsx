@@ -16,6 +16,13 @@ import SurahReaderClient from "./SurahReaderClient";
 // ─── Static Generation ────────────────────────────────────────────────
 
 /**
+ * Allow surahs that weren't pre-rendered at build time (e.g. due to API
+ * rate-limits during build) to be rendered on-demand at runtime.
+ * Without this, unbuilt paths would return 404.
+ */
+export const dynamicParams = true;
+
+/**
  * Pre-generate static pages for all 114 surahs.
  * At runtime, any surah not found falls through to notFound().
  */
