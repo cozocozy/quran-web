@@ -26,24 +26,29 @@ export default function SplashScreen() {
       setShouldRender(true);
       setIsVisible(true);
       
-      // Artificial progress bar logic
+      // Precise 3.5 seconds progress bar logic
+      const DURATION = 3500; // 3.5 seconds
+      const INTERVAL = 50;   // Update every 50ms
+      const STEPS = DURATION / INTERVAL;
+      const INCREMENT = 100 / STEPS;
+      
       let currentProgress = 0;
       const interval = setInterval(() => {
-        currentProgress += Math.random() * 15; // Random jumps for "real" feeling
+        currentProgress += INCREMENT;
         if (currentProgress >= 100) {
           currentProgress = 100;
           clearInterval(interval);
           
-          // Wait a bit at 100% then hide
+          // Wait a tiny bit at 100% then hide
           setTimeout(() => {
             setIsVisible(false);
             sessionStorage.setItem("quran-splash-shown", "true");
             // Remove from DOM after fade out
             setTimeout(() => setShouldRender(false), 500);
-          }, 400);
+          }, 300);
         }
-        setProgress(Math.floor(currentProgress));
-      }, 150);
+        setProgress(Math.min(100, Math.floor(currentProgress)));
+      }, INTERVAL);
 
       return () => clearInterval(interval);
     }
