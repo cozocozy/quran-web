@@ -195,6 +195,65 @@ export async function getSurahWithTranslation(
 }
 
 // ─────────────────────────────────────────────────────────────────────
+// Full Quran Bulk Download
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Mengambil keseluruhan Quran (114 surah) dalam satu request.
+ * Digunakan untuk fitur Download Offline agar terhindar dari rate-limit
+ * karena mengambil surah satu per satu.
+ */
+export async function getFullQuranOffline(): Promise<SurahWithTranslation[]> {
+  // Ambil seluruh quran versi bahasa arab dan terjemahannya (2 request)
+  const [arabicRes, indoRes] = await Promise.all([
+    apiFetch<{ surahs: SurahEdition[] }>(`/quran/${EDITIONS.arabic}`),
+    apiFetch<{ surahs: SurahEdition[] }>(`/quran/${EDITIONS.indonesian}`),
+  ]);
+
+  const arabicSurahs = arabicRes.surahs;
+  const indoSurahs = indoRes.surahs;
+
+  const BISMILLAH_PREFIX = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ";
+
+  return arabicSurahs.map((arabicSurah, surahIndex) => {
+    const indonesianSurah = indoSurahs[surahIndex];
+
+    const ayahs: AyahWithTranslation[] = arabicSurah.ayahs.map((arabicAyah, i) => {
+      let arabicText = arabicAyah.text;
+
+      // Hapus Bismillah di awal ayat pertama (kecuali Al-Fatihah dan At-Taubah)
+      if (arabicSurah.number !== 1 && arabicSurah.number !== 9 && arabicAyah.numberInSurah === 1) {
+        if (arabicText.startsWith(BISMILLAH_PREFIX)) {
+          arabicText = arabicText.substring(BISMILLAH_PREFIX.length);
+        } else if (arabicText.startsWith("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ")) {
+          arabicText = arabicText.substring("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ".length);
+        }
+      }
+
+      return {
+        number: arabicAyah.numberInSurah,
+        numberInQuran: arabicAyah.number,
+        arabic: arabicText,
+        translation: indonesianSurah.ayahs[i]?.text ?? "",
+        sajda: arabicAyah.sajda,
+        page: arabicAyah.page,
+        juz: arabicAyah.juz,
+      };
+    });
+
+    return {
+      number: arabicSurah.number,
+      name: arabicSurah.name,
+      englishName: INDONESIAN_SURAH_NAMES[arabicSurah.number] || arabicSurah.englishName,
+      englishNameTranslation: arabicSurah.englishNameTranslation,
+      revelationType: arabicSurah.revelationType,
+      numberOfAyahs: arabicSurah.numberOfAyahs,
+      ayahs,
+    };
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────
 // Client-side Search
 // ─────────────────────────────────────────────────────────────────────
 

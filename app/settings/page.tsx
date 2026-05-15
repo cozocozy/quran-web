@@ -217,7 +217,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
-                  ⏱️ Download dilambatkan agar tidak terkena limit API. Proses ~8–12 menit. Jangan tutup halaman ini.
+                  ⚡ Download menggunakan metode Bulk API (sangat cepat). Jangan tutup halaman ini.
                 </p>
               </div>
             )}

@@ -1,16 +1,9 @@
-"use client";
 /**
  * lib/use-offline-download.ts
- * ─────────────────────────────────────────────────────────────────────
- * Hook untuk mengelola download manual data Quran ke IndexedDB.
  *
- * Strategi anti-rate-limit:
- *  - Download dikelompokkan per batch (BATCH_SIZE surah)
- *  - Delay antar request: REQUEST_DELAY ms
- *  - Delay antar batch: BATCH_DELAY ms
- *  - Jika gagal (termasuk 429), retry dengan exponential backoff
- *  - Surah yang sudah di-cache di-skip otomatis (resume-friendly)
- * ─────────────────────────────────────────────────────────────────────
+ * Hook untuk men-download dan menyimpan surah ke IndexedDB.
+ * Menggunakan bulk download (getFullQuranOffline) agar lebih cepat dan terhindar
+ * dari rate limit dibanding men-download surah satu per satu.
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -20,20 +13,9 @@ import {
   getCachedSurahNumbers,
   clearOfflineData,
 } from "./offline-storage";
-import { getSurahWithTranslation } from "./quran-api";
+import { getFullQuranOffline } from "./quran-api";
 
-// ─── Config ──────────────────────────────────────────────────────────
-
-/** Jumlah surah per batch sebelum jeda panjang */
-const BATCH_SIZE = 3;
-/** Delay antar setiap request (ms) — 1.5 detik = ~40 req/menit */
-const REQUEST_DELAY = 1500;
-/** Jeda antar batch (ms) — beri napas server */
-const BATCH_DELAY = 6000;
-/** Maksimum retry per surah sebelum di-skip */
-const MAX_RETRIES = 5;
-
-// ─── Types ────────────────────────────────────────────────────────────
+// --- Types ------------------------------------------------------------
 
 export type DownloadStatus = "idle" | "downloading" | "done" | "error";
 
@@ -60,7 +42,7 @@ export interface UseOfflineDownload {
 
 const TOTAL_SURAHS = 114;
 
-// ─────────────────────────────────────────────────────────────────────
+// --- Hook -------------------------------------------------------------
 
 export function useOfflineDownload(): UseOfflineDownload {
   const [status, setStatus] = useState<DownloadStatus>("idle");
@@ -78,7 +60,7 @@ export function useOfflineDownload(): UseOfflineDownload {
       .catch(() => setCachedCount(0));
   }, []);
 
-  // ─── Start download ───────────────────────────────────────────────
+  // --- Start download -------------------------------------------------
 
   const startDownload = useCallback(async () => {
     if (status === "downloading") return;
@@ -88,54 +70,38 @@ export function useOfflineDownload(): UseOfflineDownload {
     setErrorMessage(null);
 
     try {
-      // Ambil surah yang sudah di-cache agar bisa di-skip (resume)
+      // Ambil surah yang sudah di-cache agar bisa dicek 
       const alreadyCached = new Set(await getCachedSurahNumbers());
       let sessionCount = alreadyCached.size;
       setDownloaded(sessionCount);
 
-      for (let surahNum = 1; surahNum <= TOTAL_SURAHS; surahNum++) {
-        if (cancelledRef.current) {
-          setStatus("idle");
-          setCachedCount(await getCachedSurahCount());
-          return;
+      if (sessionCount === TOTAL_SURAHS) {
+         setStatus("done");
+         setCachedCount(TOTAL_SURAHS);
+         return;
+      }
+
+      // Ambil seluruh Al-Quran dalam 2 request (menghindari rate limit)
+      const allSurahs = await getFullQuranOffline();
+      
+      if (cancelledRef.current) {
+        setStatus("idle");
+        setCachedCount(await getCachedSurahCount());
+        return;
+      }
+
+      // Simpan semua ke IndexedDB
+      for (let i = 0; i < allSurahs.length; i++) {
+        if (cancelledRef.current) break;
+
+        const surah = allSurahs[i];
+        if (alreadyCached.has(surah.number)) {
+          continue;
         }
 
-        // Skip surah yang sudah ada di IndexedDB
-        if (alreadyCached.has(surahNum)) continue;
-
-        // Download dengan retry + exponential backoff
-        let success = false;
-        for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-          if (cancelledRef.current) break;
-          try {
-            const surah = await getSurahWithTranslation(surahNum);
-            await saveSurah(surah);
-            sessionCount++;
-            setDownloaded(sessionCount);
-            success = true;
-            break;
-          } catch (err) {
-            const backoff = REQUEST_DELAY * 2 ** attempt; // 600, 1200, 2400ms
-            console.warn(
-              `[Offline] Surah ${surahNum} gagal (attempt ${attempt + 1}/${MAX_RETRIES}), retry dalam ${backoff}ms…`,
-              err
-            );
-            await sleep(backoff);
-          }
-        }
-
-        if (!success) {
-          console.warn(`[Offline] Surah ${surahNum} di-skip setelah ${MAX_RETRIES}x retry.`);
-        }
-
-        // Jeda antar request
-        await sleep(REQUEST_DELAY);
-
-        // Jeda lebih panjang setelah setiap batch
-        const positionInBatch = surahNum % BATCH_SIZE;
-        if (positionInBatch === 0 && surahNum < TOTAL_SURAHS) {
-          await sleep(BATCH_DELAY);
-        }
+        await saveSurah(surah);
+        sessionCount++;
+        setDownloaded(sessionCount);
       }
 
       const finalCount = await getCachedSurahCount();
@@ -143,10 +109,11 @@ export function useOfflineDownload(): UseOfflineDownload {
       setStatus(finalCount >= TOTAL_SURAHS ? "done" : "error");
       if (finalCount < TOTAL_SURAHS) {
         setErrorMessage(
-          `${TOTAL_SURAHS - finalCount} surah gagal diunduh. Tekan "Lanjutkan" untuk retry.`
+          " surah gagal disimpan. Coba lagi."
         );
       }
     } catch (err) {
+      console.error("[Offline] Gagal mengunduh full Quran:", err);
       setErrorMessage(
         err instanceof Error ? err.message : "Download gagal, coba lagi."
       );
@@ -154,13 +121,13 @@ export function useOfflineDownload(): UseOfflineDownload {
     }
   }, [status]);
 
-  // ─── Cancel ───────────────────────────────────────────────────────
+  // --- Cancel ---------------------------------------------------------
 
   const cancelDownload = useCallback(() => {
     cancelledRef.current = true;
   }, []);
 
-  // ─── Delete ───────────────────────────────────────────────────────
+  // --- Delete ---------------------------------------------------------
 
   const deleteOfflineData = useCallback(async () => {
     await clearOfflineData();
@@ -170,7 +137,7 @@ export function useOfflineDownload(): UseOfflineDownload {
     setErrorMessage(null);
   }, []);
 
-  // ─── Derived ──────────────────────────────────────────────────────
+  // --- Derived --------------------------------------------------------
 
   const isFullyAvailable = cachedCount >= TOTAL_SURAHS;
 
@@ -187,10 +154,4 @@ export function useOfflineDownload(): UseOfflineDownload {
     cancelDownload,
     deleteOfflineData,
   };
-}
-
-// ─── Helper ───────────────────────────────────────────────────────────
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
