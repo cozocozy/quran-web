@@ -109,6 +109,15 @@ export default function SurahReaderClient({ initialSurah, surahNumber }: SurahRe
     }
   }, [surah, surahNumber]);
 
+  // ── Auto-cache surah ke IndexedDB saat berhasil load online ─────────
+  // Setiap surah yang pernah dibuka saat online otomatis tersedia offline.
+  useEffect(() => {
+    if (!initialSurah) return;
+    import("@/lib/offline-storage")
+      .then((offline) => offline.saveSurah(initialSurah))
+      .catch(() => {}); // silent — jangan ganggu UX jika IndexedDB gagal
+  }, [initialSurah]);
+
   // ── Scroll to top on mount ─────────────────────────────────────────
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
