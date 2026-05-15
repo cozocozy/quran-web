@@ -25,13 +25,13 @@ import { getSurahWithTranslation } from "./quran-api";
 // ─── Config ──────────────────────────────────────────────────────────
 
 /** Jumlah surah per batch sebelum jeda panjang */
-const BATCH_SIZE = 5;
-/** Delay antar setiap request (ms) — cukup untuk hindari rate limit */
-const REQUEST_DELAY = 600;
+const BATCH_SIZE = 3;
+/** Delay antar setiap request (ms) — 1.5 detik = ~40 req/menit */
+const REQUEST_DELAY = 1500;
 /** Jeda antar batch (ms) — beri napas server */
-const BATCH_DELAY = 2000;
+const BATCH_DELAY = 6000;
 /** Maksimum retry per surah sebelum di-skip */
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 5;
 
 // ─── Types ────────────────────────────────────────────────────────────
 

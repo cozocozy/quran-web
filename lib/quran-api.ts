@@ -55,7 +55,7 @@ const EDITIONS = {
 async function apiFetch<T>(
   endpoint: string,
   options?: RequestInit,
-  retries = 3
+  retries = 5
 ): Promise<T> {
   const url = `${BASE_URL}${endpoint}`;
   
@@ -68,8 +68,10 @@ async function apiFetch<T>(
 
       if (!res.ok) {
         if (res.status === 429 && i < retries - 1) {
-          // Rate limited — wait and retry
-          await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+          // Rate limited — tunggu 15 detik sebelum retry
+          const waitMs = 15000;
+          console.warn(`[API] Rate limited (429), tunggu ${waitMs / 1000}s... (attempt ${i + 1}/${retries})`);
+          await new Promise((resolve) => setTimeout(resolve, waitMs));
           continue;
         }
         throw new Error(`API error: ${res.status} — ${url}`);
@@ -81,8 +83,8 @@ async function apiFetch<T>(
       return json.data as T;
     } catch (error) {
       if (i === retries - 1) throw error;
-      // Wait before retry
-      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+      // Untuk error selain 429, tunggu lebih pendek
+      await new Promise((resolve) => setTimeout(resolve, 2000 * (i + 1)));
     }
   }
   throw new Error("API Fetch failed after retries");
