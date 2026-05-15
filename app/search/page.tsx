@@ -35,6 +35,37 @@ export default function SearchPage() {
         setAllSurahs(surahs);
         setResults(surahs);       // Show all surahs initially
       })
+      .catch(async (err) => {
+        console.warn("Failed to fetch surah list from API, trying offline storage...", err);
+        try {
+          const offline = await import("@/lib/offline-storage");
+          const cachedNumbers = await offline.getCachedSurahNumbers();
+          
+          if (cachedNumbers.length > 0) {
+            const cachedSurahs: SurahListItemType[] = [];
+            for (const num of cachedNumbers) {
+              const surahData = await offline.getCachedSurah(num);
+              if (surahData) {
+                cachedSurahs.push({
+                  number: surahData.number,
+                  name: surahData.name,
+                  englishName: surahData.englishName,
+                  englishNameTranslation: surahData.englishNameTranslation,
+                  numberOfAyahs: surahData.numberOfAyahs,
+                  revelationType: surahData.revelationType,
+                });
+              }
+            }
+            // Ensure they are sorted
+            cachedSurahs.sort((a, b) => a.number - b.number);
+            
+            setAllSurahs(cachedSurahs);
+            setResults(cachedSurahs);
+          }
+        } catch (offlineErr) {
+          console.error("Failed to load offline surahs:", offlineErr);
+        }
+      })
       .finally(() => setIsLoading(false));
   }, []);
 
