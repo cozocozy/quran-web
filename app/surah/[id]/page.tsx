@@ -67,14 +67,6 @@ export default async function SurahPage({
   // Fetch surah data server-side — cached by Next.js
   const surah = await getSurahWithTranslation(surahNumber).catch(() => null);
 
-  if (!surah) notFound();
-
-  /**
-   * SurahReaderClient handles all interactive features:
-   * - Scroll-to-top FAB visibility
-   * - Last-read position tracking (IntersectionObserver)
-   * - Bookmark state (useBookmarks hook)
-   * - Settings (font size, translation toggle)
-   */
-  return <SurahReaderClient surah={surah} />;
+  // Jika surah null (karena offline/API error saat dev), biarkan Client Component yang mencoba meload dari IndexedDB
+  return <SurahReaderClient initialSurah={surah} surahNumber={surahNumber} />;
 }

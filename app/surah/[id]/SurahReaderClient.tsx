@@ -34,7 +34,8 @@ import type {
 // ─── Props ────────────────────────────────────────────────────────────
 
 interface SurahReaderClientProps {
-  surah: SurahWithTranslation;
+  initialSurah: SurahWithTranslation | null;
+  surahNumber: number;
 }
 
 /**
@@ -78,10 +79,13 @@ const READING_MODES: {
 
 // ─────────────────────────────────────────────────────────────────────
 
-export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
+export default function SurahReaderClient({ initialSurah, surahNumber }: SurahReaderClientProps) {
   const { bookmarks, addBookmark, removeBookmark, isBookmarked } = useBookmarks();
   const { saveLastRead } = useLastRead();
   const { settings } = useSettings();
+
+  const [surah, setSurah] = useState<SurahWithTranslation | null>(initialSurah);
+  const [isLoading, setIsLoading] = useState(!initialSurah);
 
   /**
    * readingMode is local per-session state — changing it doesn't write to
@@ -92,6 +96,18 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
     settings.readingMode ?? "default"
   );
   const listRef = useRef<HTMLDivElement>(null);
+
+  // ── Load from offline storage if initialSurah is null ──────────────
+  useEffect(() => {
+    if (!surah) {
+      import("@/lib/offline-storage").then((offline) => {
+        offline.getCachedSurah(surahNumber).then((cached) => {
+          if (cached) setSurah(cached);
+          setIsLoading(false);
+        }).catch(() => setIsLoading(false));
+      });
+    }
+  }, [surah, surahNumber]);
 
   // ── Scroll to top on mount ─────────────────────────────────────────
   useEffect(() => {
@@ -115,6 +131,7 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (!surah) return;
         const visible = entries
           .filter((e) => e.isIntersecting && e.intersectionRatio >= 0.5)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
@@ -148,6 +165,7 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
 
   const handleBookmark = useCallback(
     (ayah: AyahWithTranslation) => {
+      if (!surah) return;
       const bookmark: Bookmark = {
         surahNumber: surah.number,
         ayahNumber: ayah.number,
@@ -161,11 +179,39 @@ export default function SurahReaderClient({ surah }: SurahReaderClientProps) {
   );
 
   const handleUnbookmark = useCallback(
-    (ayahNumber: number) => removeBookmark(surah.number, ayahNumber),
-    [surah.number, removeBookmark]
+    (ayahNumber: number) => {
+      if (!surah) return;
+      removeBookmark(surah.number, ayahNumber);
+    },
+    [surah, removeBookmark]
   );
 
   // ─────────────────────────────────────────────────────────────────
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground animate-pulse text-sm">Memuat data Surah...</p>
+      </div>
+    );
+  }
+
+  if (!surah) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <h2 className="text-xl font-bold text-foreground mb-2">Surah Tidak Ditemukan</h2>
+        <p className="text-muted-foreground text-sm mb-6">
+          Gagal mengambil data. Pastikan koneksi internet aktif, atau unduh data di mode offline.
+        </p>
+        <Link
+          href="/"
+          className="px-4 py-2 bg-[oklch(0.6_0.14_196)] text-white rounded-xl text-sm font-medium touch-no-highlight"
+        >
+          Kembali ke Beranda
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

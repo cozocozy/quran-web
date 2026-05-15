@@ -12,6 +12,7 @@
  * ─────────────────────────────────────────────────────────────────────
  */
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/use-settings";
 import { useOfflineDownload } from "@/lib/use-offline-download";
@@ -227,9 +228,23 @@ export default function SettingsPage() {
 
             {/* Done message */}
             {state.status === "done" && (
-              <p className="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 rounded-lg px-3 py-2">
-                ✅ Semua {state.cachedCount} surah berhasil disimpan. Kini bisa dibaca tanpa internet.
-              </p>
+              <div className="flex flex-col items-center justify-center py-5 px-4 bg-gradient-to-b from-green-50/50 to-transparent dark:from-green-950/20 dark:to-transparent rounded-xl border border-green-100 dark:border-green-900/30">
+                <div className="relative w-24 h-24 mb-4">
+                  <Image
+                    src="/quran-icon.png"
+                    alt="Al-Quran Offline"
+                    fill
+                    className="object-contain drop-shadow-md hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 96px) 100vw, 96px"
+                  />
+                </div>
+                <p className="text-sm font-semibold text-green-700 dark:text-green-400 text-center">
+                  Alhamdulillah, Siap Offline!
+                </p>
+                <p className="text-xs text-green-600/80 dark:text-green-500/80 mt-1.5 text-center max-w-[200px] leading-relaxed">
+                  Semua {state.cachedCount} surah telah tersimpan dan bisa dibaca tanpa koneksi internet.
+                </p>
+              </div>
             )}
 
             {/* Action buttons */}
