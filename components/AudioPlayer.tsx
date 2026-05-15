@@ -69,6 +69,12 @@ export default function AudioPlayer({ globalAyahNumber, ayahKey }: AudioPlayerPr
   // ── Toggle play/pause ──────────────────────────────────────────────
 
   const handleToggle = useCallback(async () => {
+    // Cek koneksi internet
+    if (!navigator.onLine) {
+      alert("Mohon maaf, murottal (audio) hanya bisa diputar saat online. Pastikan koneksi internet Anda aktif.");
+      return;
+    }
+
     // Lazily create the audio element on first interaction
     if (!audioRef.current) {
       audioRef.current = new Audio(audioUrl);
