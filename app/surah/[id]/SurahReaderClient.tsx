@@ -118,9 +118,19 @@ export default function SurahReaderClient({ initialSurah, surahNumber }: SurahRe
       .catch(() => {}); // silent — jangan ganggu UX jika IndexedDB gagal
   }, [initialSurah]);
 
-  // ── Scroll to top on mount ─────────────────────────────────────────
+  // ── Scroll to top or hash on mount ─────────────────────────────────
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
+    const hash = window.location.hash;
+    if (hash) {
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    } else {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
   }, []);
 
   // ── Sync initial mode from settings after hydration ────────────────
@@ -333,6 +343,7 @@ export default function SurahReaderClient({ initialSurah, surahNumber }: SurahRe
               {surah.ayahs.map((ayah) => (
                 <span
                   key={ayah.number}
+                  id={`ayah-${ayah.number}`}
                   data-ayah={ayah.number}
                   className="inline"
                 >
@@ -351,6 +362,7 @@ export default function SurahReaderClient({ initialSurah, surahNumber }: SurahRe
               {surah.ayahs.map((ayah) => (
                 <span
                   key={ayah.number}
+                  id={`ayah-${ayah.number}`}
                   data-ayah={ayah.number}
                   className="inline"
                 >
