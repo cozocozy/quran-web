@@ -135,7 +135,7 @@ const AyahCard = memo(function AyahCard({
       {showArabic && (
         <p
           className={cn(
-            "arabic-text text-foreground mb-4 text-justify",
+            "arabic-text text-foreground mb-4 text-right",
             ARABIC_SIZE[fontSize][readingMode],
             // In arabic-only mode add extra bottom margin for visual breathing
             readingMode === "arabic" && "mb-8"
@@ -151,7 +151,7 @@ const AyahCard = memo(function AyahCard({
       {showTranslation && (
         <p
           className={cn(
-            "leading-relaxed text-muted-foreground mb-4 text-justify",
+            "leading-relaxed text-muted-foreground mb-4",
             // Larger text in translation-only mode for easier reading
             readingMode === "translation" ? "text-base" : "text-sm",
             // Border accent only in default mode (would look odd in translation-only)
