@@ -190,7 +190,6 @@
 .arabic-text {
   font-family: var(--font-arabic);
   direction: rtl;
-  text-align: justify;
   /* Enable Quranic ligatures and contextual alternates */
   font-feature-settings: "rlig" 1, "calt" 1, "liga" 1;
   line-height: 2;             /* Extra line-height for diacritics */
