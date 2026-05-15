@@ -99,9 +99,9 @@ export default function SplashScreen() {
           </div>
           
           {/* Progress Bar Container */}
-          <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden border border-white/5">
+          <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden border border-white/5 relative">
             <div
-              className="h-full bg-white transition-all duration-200 ease-out shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+              className="absolute top-0 left-0 h-full rounded-full transition-all duration-200 ease-out shadow-[0_0_15px_rgba(255,255,255,0.6)] animate-water-flow bg-gradient-to-r from-white via-white/50 to-white bg-[length:200%_100%]"
               style={{ width: `${progress}%` }}
             />
           </div>

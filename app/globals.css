@@ -58,6 +58,7 @@
   /* Custom Splash Animations */
   --animate-bounce-slow: bounce-slow 3s ease-in-out infinite;
   --animate-shimmer: shimmer 2s linear infinite;
+  --animate-water-flow: water-flow 3s linear infinite;
 
   @keyframes bounce-slow {
     0%, 100% { transform: translateY(0); }
@@ -67,6 +68,11 @@
   @keyframes shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(200%); }
+  }
+
+  @keyframes water-flow {
+    0% { background-position: 200% 50%; }
+    100% { background-position: 0% 50%; }
   }
 }
 
