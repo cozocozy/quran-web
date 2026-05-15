@@ -17,6 +17,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import ThemeProvider from "@/components/ThemeProvider";
+import SplashScreen from "@/components/shared/SplashScreen";
 
 // ─── Fonts ────────────────────────────────────────────────────────────
 
@@ -43,6 +44,14 @@ export const metadata: Metadata = {
   authors: [{ name: "Al-Quran Web App" }],
   robots: "index, follow",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Al-Quran",
+  },
+  icons: {
+    apple: "/quran-icon.png",
+  },
   openGraph: {
     type: "website",
     locale: "id_ID",
@@ -57,8 +66,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,         // Allow pinch-zoom for accessibility
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+    { media: "(prefers-color-scheme: light)", color: "#0d9488" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d9488" },
   ],
 };
 
@@ -97,6 +106,7 @@ export default function RootLayout({
       >
         {/* Fixed bottom navigation — rendered on all pages */}
         <ThemeProvider>
+          <SplashScreen />
           <main className="min-h-screen pb-[80px]">
             {children}
           </main>
