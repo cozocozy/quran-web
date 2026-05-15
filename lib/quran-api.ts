@@ -21,6 +21,16 @@ import type {
 
 import { INDONESIAN_SURAH_NAMES } from "./surah-names";
 
+// Lazy import offline storage (client-side only)
+async function getOfflineStorage() {
+  if (typeof window === "undefined") return null;
+  try {
+    return await import("./offline-storage");
+  } catch {
+    return null;
+  }
+}
+
 /** Base URL for Al-Quran Cloud API v1 */
 const BASE_URL = "https://api.alquran.cloud/v1";
 
@@ -94,8 +104,10 @@ export async function getSurahList(): Promise<SurahListItem[]> {
 
 /**
  * Fetches a complete surah with both Arabic text and Indonesian translation.
- * The API returns an array of two edition objects — we zip them into
- * a paired `AyahWithTranslation[]` for easy rendering.
+ *
+ * Offline-first strategy:
+ *  1. Jika ada cache di IndexedDB → pakai cache (works offline)
+ *  2. Jika tidak ada / online → fetch dari API lalu simpan ke cache
  *
  * @param surahNumber  Surah number 1–114
  * @returns Structured surah object with paired ayahs
@@ -103,6 +115,20 @@ export async function getSurahList(): Promise<SurahListItem[]> {
 export async function getSurahWithTranslation(
   surahNumber: number
 ): Promise<SurahWithTranslation> {
+  // ── 1. Cek cache IndexedDB dulu (client-side only) ─────────────────
+  if (typeof window !== "undefined") {
+    try {
+      const offline = await getOfflineStorage();
+      if (offline) {
+        const cached = await offline.getCachedSurah(surahNumber);
+        if (cached) return cached;
+      }
+    } catch {
+      // Jika IndexedDB error, lanjut ke network
+    }
+  }
+
+  // ── 2. Fetch dari API ──────────────────────────────────────────────
   const editions = `${EDITIONS.arabic},${EDITIONS.indonesian}`;
   const data = await apiFetch<SurahEdition[]>(
     `/surah/${surahNumber}/editions/${editions}`

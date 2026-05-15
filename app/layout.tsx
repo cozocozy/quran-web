@@ -42,6 +42,7 @@ export const metadata: Metadata = {
   keywords: ["al-quran", "quran online", "quran indonesia", "terjemahan quran"],
   authors: [{ name: "Al-Quran Web App" }],
   robots: "index, follow",
+  manifest: "/manifest.json",
   openGraph: {
     type: "website",
     locale: "id_ID",
