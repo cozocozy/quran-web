@@ -48,30 +48,44 @@ const EDITIONS = {
  * Internal fetch wrapper.
  * Throws a descriptive error when the API returns a non-OK status.
  */
+/**
+ * Internal fetch wrapper with retry logic.
+ * Useful for build time where we might hit rate limits.
+ */
 async function apiFetch<T>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit,
+  retries = 3
 ): Promise<T> {
   const url = `${BASE_URL}${endpoint}`;
-  const res = await fetch(url, {
-    cache: "force-cache",   // Aggressive caching — Quran text never changes
-    ...options,
-  });
+  
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, {
+        cache: "force-cache",
+        ...options,
+      });
 
-  if (!res.ok) {
-    throw new Error(
-      `Al-Quran API error: ${res.status} ${res.statusText} — ${url}`
-    );
+      if (!res.ok) {
+        if (res.status === 429 && i < retries - 1) {
+          // Rate limited — wait and retry
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+          continue;
+        }
+        throw new Error(`API error: ${res.status} — ${url}`);
+      }
+
+      const json = await res.json();
+      if (json.code !== 200) throw new Error(`API error code ${json.code}`);
+      
+      return json.data as T;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      // Wait before retry
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
+    }
   }
-
-  const json = await res.json();
-
-  // The API wraps all responses in { code, status, data }
-  if (json.code !== 200) {
-    throw new Error(`API responded with code ${json.code}: ${json.status}`);
-  }
-
-  return json.data as T;
+  throw new Error("API Fetch failed after retries");
 }
 
 // ─────────────────────────────────────────────────────────────────────

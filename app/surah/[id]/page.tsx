@@ -65,8 +65,13 @@ export default async function SurahPage({
   }
 
   // Fetch surah data server-side — cached by Next.js
-  const surah = await getSurahWithTranslation(surahNumber).catch(() => null);
+  let surah = null;
+  try {
+    surah = await getSurahWithTranslation(surahNumber);
+  } catch (err) {
+    console.error(`Gagal mengambil data Surah ${surahNumber}:`, err);
+  }
 
-  // Jika surah null (karena offline/API error saat dev), biarkan Client Component yang mencoba meload dari IndexedDB
+  // Jika surah null (karena offline/API error saat dev/build), biarkan Client Component yang mencoba meload dari IndexedDB
   return <SurahReaderClient initialSurah={surah} surahNumber={surahNumber} />;
 }
