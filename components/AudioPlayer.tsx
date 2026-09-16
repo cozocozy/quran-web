@@ -104,13 +104,15 @@ export default function AudioPlayer({ globalAyahNumber, ayahKey }: AudioPlayerPr
       setIsLoading(true);
       try {
         await audioRef.current.play();
+        // BUG FIX: set loading false BEFORE playing true so UI shows
+        // pause icon immediately instead of briefly flashing the spinner
+        setIsLoading(false);
         setIsPlaying(true);
       } catch {
         // Browser blocked autoplay — user gesture was already present, so
         // this should not happen, but we handle it gracefully
-        setIsPlaying(false);
-      } finally {
         setIsLoading(false);
+        setIsPlaying(false);
       }
     }
   }, [isPlaying, audioUrl, ayahKey]);

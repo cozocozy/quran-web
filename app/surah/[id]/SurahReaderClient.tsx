@@ -369,7 +369,8 @@ export default function SurahReaderClient({ initialSurah, surahNumber }: SurahRe
                   <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[9px] font-bold mr-1.5 align-middle shadow-sm bg-[#DFF5EC] text-[#1F7A5A] dark:bg-[#1E3A34] dark:text-[#7BE0B8]">
                     {ayah.number}
                   </span>
-                  <span dangerouslySetInnerHTML={{ __html: ayah.translation }} />{" "}
+                  {/* BUG FIX: was dangerouslySetInnerHTML — XSS risk, data is plain text */}
+                  <span>{ayah.translation}</span>{" "}
                 </span>
               ))}
             </p>

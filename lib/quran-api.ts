@@ -270,15 +270,19 @@ export function filterSurahs(
   surahs: SurahListItem[],
   query: string
 ): SurahListItem[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return surahs;
+  const raw = query.trim().toLowerCase();
+  if (!raw) return surahs;
+
+  // Normalize: remove hyphens & collapse spaces so "al ma" matches "al-maidah"
+  const normalize = (s: string) => s.toLowerCase().replace(/[-\s]+/g, " ").trim();
+  const q = normalize(raw);
 
   return surahs.filter(
     (s) =>
-      s.englishName.toLowerCase().includes(q) ||
-      s.englishNameTranslation.toLowerCase().includes(q) ||
-      s.name.includes(query) ||               // Arabic — case-sensitive
-      String(s.number).includes(q)            // Search by surah number
+      normalize(s.englishName).includes(q) ||
+      normalize(s.englishNameTranslation).includes(q) ||
+      s.name.includes(query) ||
+      String(s.number).includes(q)
   );
 }
 

@@ -10,6 +10,7 @@
  * ─────────────────────────────────────────────────────────────────────
  */
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BookOpen, ChevronRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function LastReadCard() {
   const { lastRead } = useLastRead();
+  // BUG FIX: guard against hydration flash (Welcome→Resume card CLS).
+  // On the server and first client render lastRead is always null
+  // (it's loaded from localStorage in a useEffect). Without this guard
+  // the card always shows "Welcome" briefly then jumps to "Resume".
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Show skeleton while hydrating to avoid layout shift
+  if (!mounted) {
+    return <LastReadCardSkeleton />;
+  }
 
   // ── Welcome card (no history) ────────────────────────────────────
   if (!lastRead) {

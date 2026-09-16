@@ -33,24 +33,24 @@ export default function SplashScreen() {
 
     // Check if we've already shown the splash in this session
     const hasShown = sessionStorage.getItem("quran-splash-shown");
-    
+
     if (!hasShown) {
       setShouldRender(true);
       setIsVisible(true);
-      
+
       // Precise 3.5 seconds progress bar logic
       const DURATION = 3500; // 3.5 seconds
       const INTERVAL = 50;   // Update every 50ms
       const STEPS = DURATION / INTERVAL;
       const INCREMENT = 100 / STEPS;
-      
+
       let currentProgress = 0;
       const interval = setInterval(() => {
         currentProgress += INCREMENT;
         if (currentProgress >= 100) {
           currentProgress = 100;
           clearInterval(interval);
-          
+
           // Wait a tiny bit at 100% then hide
           setTimeout(() => {
             setIsVisible(false);
@@ -77,7 +77,7 @@ export default function SplashScreen() {
       )}
     >
       <div className="flex flex-col items-center w-full max-w-[280px] animate-in fade-in zoom-in duration-700">
-        
+
         {/* Modern Quran Icon */}
         <div className="relative w-32 h-32 mb-8 animate-bounce-slow rounded-3xl overflow-hidden shadow-2xl shadow-black/20 bg-white">
           <Image
@@ -91,8 +91,9 @@ export default function SplashScreen() {
 
         {/* Brand Header */}
         <div className="text-center mb-10 px-2">
+          {/* BUG FIX: was "{quote}" (string literal), now {quote} (JSX expression) */}
           <h1 className="text-base md:text-lg font-bold text-white mb-3 leading-snug italic">
-            "{quote}"
+            {quote}
           </h1>
           <p className="text-[10px] font-bold text-white/50 tracking-[0.3em] uppercase">
             Digital Al-Quran App
@@ -109,7 +110,7 @@ export default function SplashScreen() {
               {progress}%
             </span>
           </div>
-          
+
           {/* Progress Bar Container */}
           <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden border border-white/5 relative">
             <div
