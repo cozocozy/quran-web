@@ -91,10 +91,9 @@ Project ini di-deploy menggunakan **Netlify** dan dapat diakses secara publik di
 ## 👤 Tentang Developer
 
 Project ini dibuat sebagai bagian dari portofolio pengembangan web, menunjukkan kemampuan dalam:
-- Membangun aplikasi web full-featured dari nol
+- Membangun aplikasi web full-featured menggunakan Claude & Gemini untuk akselerasi, refactoring, dan optimasi arsitektur
 - Bekerja dengan data terstruktur (114 surah, ribuan ayat)
-- Implementasi UI/UX yang ramah pengguna untuk kebutuhan ibadah harian
-- Deployment dan optimasi SEO untuk aplikasi web publik
+- Implementasi UI/UX yang ramah pengguna untuk kebutuhan harian
 
 ## 👨‍💻 Author & Contact
 
