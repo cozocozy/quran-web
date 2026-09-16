@@ -96,10 +96,15 @@ Project ini dibuat sebagai bagian dari portofolio pengembangan web, menunjukkan 
 - Implementasi UI/UX yang ramah pengguna untuk kebutuhan ibadah harian
 - Deployment dan optimasi SEO untuk aplikasi web publik
 
-**Kontak:** _(isi nama, email, LinkedIn, atau portofolio lain di sini)_
+## 👨‍💻 Author & Contact
 
----
+Dikembangkan oleh **Septian Hadi Prakoso**
+
+- 📧 Email: septianhadipdev@gmail.com
+- 💼 LinkedIn: [Septian Hadi Prakoso](https://www.linkedin.com/in/septian-hadi-prakoso-632446243)
+- 🐙 GitHub: [@cozocozy](https://github.com/cozocozy)
 
 ## 📄 Lisensi
 
-_(isi jenis lisensi, misal MIT License, atau tulis "Proyek ini dibuat untuk tujuan pembelajaran dan portofolio.")_
+Project ini dibuat untuk kebutuhan portofolio / komersial dan dilindungi di bawah lisensi [MIT License](LICENSE).
+
